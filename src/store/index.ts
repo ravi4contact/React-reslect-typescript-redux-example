@@ -8,19 +8,17 @@ import { InventoryReducer } from "./inventory/reducer";
 import { InventoryState } from "./inventory/types";
 
 // import cartSaga from "./cart/sagas";
-import { cartReducer } from "./cart/reducer";
-import { cartState } from "./cart/types";
+
 import { RouterState } from "connected-react-router";
 
 export interface ApplicationState {
-  cart: cartState;
+
   inventory: InventoryState;
   router: RouterState;
 }
 
 export const createRootReducer = (history: History) =>
   combineReducers({
-    cart: cartReducer,
     inventory: InventoryReducer,
     router: connectRouter(history)
   });

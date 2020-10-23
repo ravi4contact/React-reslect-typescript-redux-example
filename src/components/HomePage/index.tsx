@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState , useRef} from "react";
 import { connect } from "react-redux";
 import styled from "styled-components";
 
@@ -17,11 +17,22 @@ const Container = styled.div`
   width: 100%;
   max-width: 1170px;
   margin: auto;
+
+  .footerBtn{
+    margin-top: 20px;
+    margin-left: 5px;
+  }
+  .disableDleteRow{
+    opacity:.2;
+  }
+  .eableDleteRow{
+    opacity:1;
+  }
   table{
 	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 	border-collapse: collapse;
 	width: 100%;
-	margin-top: 20px;
+  margin-top: 20px;
 	  tr{
 		  &:nth-child(even){background-color: #f2f2f2;}
 		  &:hover {background-color: #ddd;}
@@ -66,8 +77,13 @@ const HomePage: React.FC<AllProps> = ({
   fetchRequest
 }) => {
   const [myData,setMyData] = useState<any>([]);
-
   const [filterData, setFilterdata] = useState<any>([]);
+  const [filterEditedData, setFilterEditedData] = useState<any>([]);
+  const [rowModeisEditable, setRowModeisEditable] = useState<any>(false);
+
+  const [disableFooterBtn, setDisableFooterBtn] = useState<any>(true);
+
+
   useEffect(() => {
     fetchRequest();
 
@@ -77,6 +93,14 @@ const HomePage: React.FC<AllProps> = ({
 
   }, [data]);
 
+  useEffect(() => {
+    setDisableFooterBtn((filterData.length >0 )? false:true);
+
+  }, [filterData]);
+  
+  
+
+  
   const handleFilterData = (obj: any) => {
     const {id} = obj;
     const selectedOpt = myData.filter((value: any)=>value.id != id);
@@ -97,26 +121,57 @@ const HomePage: React.FC<AllProps> = ({
     const tableDataClone = [...myData,obj];
     setMyData(tableDataClone);
   } 
+
+  const clickHanler = (e: any) => {
+    const {id} = e.target;
+    let val = (id === 'edit')? true:false;
+    setRowModeisEditable(val);
+    if (id === 'edit'){
+      setFilterEditedData(filterData);
+    }else if(id === 'save'){
+      setFilterdata(filterEditedData)
+    }
+  
+  } 
+
+  const handleValueTextBox = (key: string, id: string, e:any) => {
+
+    const re = /^[0-9\b]+$/;
+    let tValue = e.target.value ;
+    if(tValue === '' || re.test(tValue)) {
+
+        const valueChanged = filterEditedData.map((value: any)=>{
+          if(value.id === id){
+            return {...value,[key]: tValue }
+          }
+          return value;
+        
+        });
+        setFilterEditedData(valueChanged)
+    }
+    
+
+  } 
   const handleCheckBox = (key: string, id: string) => {
     if(key != "recommended"){
-		const checkOptionStatus = filterData.map((value: any)=>{
+		  const checkOptionStatus = filterEditedData.map((value: any)=>{
 			if(value.id === id){
 				return {...value,[key]:!value[key], recommended:false}
 			}
 			return value;
 		
 		});
-		setFilterdata(checkOptionStatus)
-	}else{
-		const checkOptionStatus = filterData.map((value: any)=>{
-			if(value.id === id){
-				return {...value,[key]:!value[key],isKey:false,mandatory:false}
-			}
-			return value;
-		
-		});
-		setFilterdata(checkOptionStatus)
-	}
+		setFilterEditedData(checkOptionStatus)
+    }else{
+      const checkOptionStatus = filterEditedData.map((value: any)=>{
+        if(value.id === id){
+          return {...value,[key]:!value[key],isKey:false,mandatory:false}
+        }
+        return value;
+      
+      });
+      setFilterEditedData(checkOptionStatus)
+    }
   } 
 
   return (
@@ -125,14 +180,22 @@ const HomePage: React.FC<AllProps> = ({
       data={myData}
       handleFilterData ={handleFilterData}
       handleTableData = {handleTableData}
+      disableDropdown ={rowModeisEditable}
       
       />
       <TableCom 
-      data={filterData}
+      data={ (rowModeisEditable)? filterEditedData : filterData}
       handleFilterDataTable ={handleFilterDataTable}
-	  handleTableDataTable = {handleTableDataTable}
-	  handleCheckBox = {handleCheckBox}
+      handleTableDataTable = {handleTableDataTable}
+      handleCheckBox = {handleCheckBox}
+      handleValueTextBox = {handleValueTextBox}
+      rowModeisEditable = {rowModeisEditable}
       />
+      <div className ="footer">
+      <button className ="footerBtn" disabled={disableFooterBtn || rowModeisEditable} id ="edit"onClick = {(e)=>{clickHanler(e); }}>Edit</button>
+      <button className ="footerBtn" disabled={disableFooterBtn || !rowModeisEditable}  id ="save" onClick = {(e)=>{clickHanler(e); }}>Save</button>
+      <button className ="footerBtn" disabled={disableFooterBtn || !rowModeisEditable} id ="cancel" onClick = {(e)=>{clickHanler(e);}}>Cancel</button>
+      </div>
     </Container>
   );
 };

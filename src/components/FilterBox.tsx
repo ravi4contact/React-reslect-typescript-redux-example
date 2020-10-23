@@ -5,16 +5,16 @@ interface FilterBoxProps{
     data:any;
     handleFilterData:any;
     handleTableData:any;
+    disableDropdown: boolean;
 }
 
-const FilterBox:React.FC<FilterBoxProps> =({data, handleFilterData, handleTableData})=>{
+const FilterBox:React.FC<FilterBoxProps> =({data, handleFilterData, handleTableData,disableDropdown})=>{
     /*const dataField = useMemo(()=>{
      return data.map((d: any) => {
        return {...d}
   
       })
     },[data])*/
-console.log(data,".....*******...")
     return(
        <>
             <Select options={data} 
@@ -26,6 +26,7 @@ console.log(data,".....*******...")
                 }} 
                 
                 isSearchable ={true}
+                isDisabled ={disableDropdown}
                 />
     </>
     )

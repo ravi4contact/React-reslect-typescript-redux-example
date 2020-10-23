@@ -7,10 +7,11 @@ interface TableComProps{
     handleFilterDataTable :any;
     handleTableDataTable :any;
     handleCheckBox: any;
+    handleValueTextBox :any;
+    rowModeisEditable: boolean;
 }
 
-const TableCom:React.FC<TableComProps> =({data, handleFilterDataTable, handleTableDataTable, handleCheckBox})=>{
-   console.log(data,'.....data');
+const TableCom:React.FC<TableComProps> =({data, handleFilterDataTable, handleTableDataTable, handleCheckBox,handleValueTextBox , rowModeisEditable})=>{
 
     return(
        <>
@@ -33,6 +34,8 @@ const TableCom:React.FC<TableComProps> =({data, handleFilterDataTable, handleTab
                      handleFilterDataTable ={handleFilterDataTable}
                      handleTableDataTable = {handleTableDataTable}
                      handleCheckBox = {handleCheckBox}
+                     handleValueTextBox = {handleValueTextBox}
+                     rowModeisEditable = {rowModeisEditable}
                      />
                 })}
                 {data && data.length === 0 && (<tr><td colSpan = {6} style={{textAlign :"center"}}>No data found</td></tr>)}
